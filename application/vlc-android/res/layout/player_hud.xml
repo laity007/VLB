@@ -501,6 +501,24 @@
                     vlc:srcCompat="@drawable/ic_player_ratio" />
 
             <ImageView
+                    android:id="@+id/player_overlay_beauty"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="@dimen/small_margins_sides"
+                    android:background="?attr/selectableItemBackgroundBorderless"
+                    android:clickable="true"
+                    android:contentDescription="@string/beauty_panel_button"
+                    android:focusable="true"
+                    android:onClick="@{(v) -> player.toggleBeautyPanel()}"
+                    android:scaleType="center"
+                    tools:visibility="visible"
+                    vlc:layout_constraintBottom_toBottomOf="@+id/player_overlay_play"
+                    vlc:layout_constraintEnd_toStartOf="@+id/player_overlay_adv_function"
+                    vlc:layout_constraintStart_toEndOf="@+id/player_resize"
+                    vlc:layout_constraintTop_toTopOf="@+id/player_overlay_play"
+                    vlc:srcCompat="@drawable/ic_beauty" />
+
+            <ImageView
                     android:id="@+id/player_overlay_adv_function"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -514,7 +532,7 @@
                     tools:visibility="visible"
                     vlc:layout_constraintBottom_toBottomOf="@+id/player_overlay_play"
                     vlc:layout_constraintEnd_toEndOf="parent"
-                    vlc:layout_constraintStart_toEndOf="@+id/player_resize"
+                    vlc:layout_constraintStart_toEndOf="@+id/player_overlay_beauty"
                     vlc:layout_constraintTop_toTopOf="@+id/player_overlay_play"
                     vlc:srcCompat="@drawable/ic_player_more" />
 

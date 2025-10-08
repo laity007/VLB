@@ -432,6 +432,7 @@ class VideoPlayerOverlayDelegate (private val player: VideoPlayerActivity) {
             }
             if (!player.isShowing) {
                 player.isShowing = true
+                player.onOverlayVisibilityChanged(true)
                 if (!player.isLocked) {
                     showControls(true)
                 }
@@ -950,6 +951,7 @@ class VideoPlayerOverlayDelegate (private val player: VideoPlayerActivity) {
 
             showControls(false)
             player.isShowing = false
+            player.onOverlayVisibilityChanged(false)
             dimStatusBar(true)
             playlistSearchText.editText?.setText("")
         } else if (!fromUser) {
