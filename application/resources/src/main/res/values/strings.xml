@@ -1338,4 +1338,12 @@
     <string name="queue_format">Queue format</string>
     <string name="queue_format_short_desc">Queue position</string>
     <string name="queue_format_long_desc">Queue position / Queue size</string>
+    <string name="beauty_switch">Beauty mode</string>
+    <string name="beauty_section_face">Face adjustments</string>
+    <string name="beauty_section_filters">Filters</string>
+    <string name="beauty_filter_none">Original</string>
+    <string name="beauty_filter_warm">Warm glow</string>
+    <string name="beauty_filter_film">Cinematic</string>
+    <string name="beauty_filter_retro">Retro</string>
+    <string name="beauty_panel_button">Beauty</string>
 </resources>

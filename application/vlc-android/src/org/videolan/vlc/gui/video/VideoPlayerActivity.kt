@@ -79,6 +79,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.appcompat.app.BaseContextWrappingDelegate
 import androidx.appcompat.widget.PopupMenu
+import androidx.appcompat.widget.ViewStubCompat
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.constraintlayout.widget.ConstraintSet
 import androidx.constraintlayout.widget.Guideline
@@ -184,6 +185,8 @@ import org.videolan.vlc.getSelectedVideoTrack
 import org.videolan.vlc.gui.DialogActivity
 import org.videolan.vlc.gui.audio.EqualizerFragment
 import org.videolan.vlc.gui.audio.PlaylistAdapter
+import org.videolan.vlc.gui.beauty.BeautyVideoLayout
+import org.videolan.vlc.gui.beauty.VideoBeautyDelegate
 import org.videolan.vlc.gui.browser.EXTRA_MRL
 import org.videolan.vlc.gui.dialogs.PlaybackSpeedDialog
 import org.videolan.vlc.gui.dialogs.RenderersDialog
@@ -300,6 +303,8 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
     private val playerKeyListenerDelegate: PlayerKeyListenerDelegate by lazy(LazyThreadSafetyMode.NONE) { PlayerKeyListenerDelegate(this@VideoPlayerActivity) }
     val tipsDelegate: VideoTipsDelegate by lazy(LazyThreadSafetyMode.NONE) { VideoTipsDelegate(this@VideoPlayerActivity) }
     var isTv: Boolean = false
+
+    private var beautyDelegate: VideoBeautyDelegate? = null
 
     private val dialogsDelegate = DialogDelegate()
     private var baseContextWrappingDelegate: AppCompatDelegate? = null
@@ -544,6 +549,10 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
         }
 
         videoLayout = findViewById(R.id.video_layout)
+        beautyDelegate = (videoLayout as? BeautyVideoLayout)?.let { beautyLayout ->
+            val stub = findViewById<ViewStubCompat?>(R.id.player_beauty_stub)
+            if (stub != null) VideoBeautyDelegate(this, beautyLayout, stub) else null
+        }
 
         /* Loading view */
         loadingImageView = findViewById(R.id.player_overlay_loading)
@@ -726,6 +735,7 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
     override fun onResume() {
         overridePendingTransition(0, 0)
         super.onResume()
+        beautyDelegate?.onResume()
         isShowingDialog = false
         waitingForPin = false
 
@@ -778,6 +788,7 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
         val finishing = isFinishing
         if (finishing)
             overridePendingTransition(0, 0)
+        beautyDelegate?.onPause()
         else
             overlayDelegate.hideOverlay(true)
         super.onPause()
@@ -999,6 +1010,7 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
 
     override fun onDestroy() {
         super.onDestroy()
+        beautyDelegate?.onDestroy()
         playlistModel?.run {
             dataset.removeObserver(playlistObserver)
             onCleared()
@@ -1028,6 +1040,7 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
             val mediaPlayer = mediaplayer
             if (!displayManager.isOnRenderer) videoLayout?.let {
                 mediaPlayer.attachViews(it, displayManager, true, false)
+                beautyDelegate?.attachToPlayer(mediaPlayer, displayManager)
                 val size = if (isBenchmark) MediaPlayer.ScaleType.SURFACE_FILL else MediaPlayer.ScaleType.values()[settings.getInt(VIDEO_RATIO, MediaPlayer.ScaleType.SURFACE_BEST_FIT.ordinal)]
                 mediaPlayer.videoScale = size
             }
@@ -1057,6 +1070,7 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
     private fun stopPlayback() {
         if (!playbackStarted) return
 
+        beautyDelegate?.detachFromPlayer()
         if (!displayManager.isPrimary && !isFinishing || service == null) {
             playbackStarted = false
             return
@@ -1161,6 +1175,7 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
         /* Stop listening for changes to media routes. */
         if (!isBenchmark) displayManager.removeMediaRouterCallback()
 
+        beautyDelegate?.detachFromPlayer()
         if (!displayManager.isSecondary) service?.mediaplayer?.detachViews()
     }
 
@@ -2059,6 +2074,14 @@ open class VideoPlayerActivity : AppCompatActivity(), PlaybackService.Callback, 
     fun resizeVideo() = resizeDelegate.resizeVideo()
 
     fun displayResize() = resizeDelegate.displayResize()
+
+    fun toggleBeautyPanel() {
+        beautyDelegate?.togglePanel()
+    }
+
+    fun onOverlayVisibilityChanged(visible: Boolean) {
+        beautyDelegate?.onOverlayVisibilityChanged(visible)
+    }
 
     private fun showTitle() {
         if (isNavMenu) return

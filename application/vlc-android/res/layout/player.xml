@@ -14,7 +14,7 @@
      (which requires the surface not be centered), while keeping the result centered
     -->
 
-    <org.videolan.libvlc.util.VLCVideoLayout
+    <org.videolan.vlc.gui.beauty.BeautyVideoLayout
             android:id="@+id/video_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -97,6 +97,13 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical|end"/>
+
+        <androidx.appcompat.widget.ViewStubCompat
+                android:id="@+id/player_beauty_stub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical|end"
+                android:layout="@layout/player_beauty_panel" />
 
         <androidx.appcompat.widget.ViewStubCompat
                 android:id="@+id/player_hud_right_stub"
